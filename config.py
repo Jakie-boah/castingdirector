@@ -13,7 +13,7 @@ Host = os.getenv('Host')
 DATABASE = os.getenv('DATABASE')
 PASSWORD = os.getenv("PASSWORD")
 list_super_admins = os.getenv('list_super_admins')
-
+DB_URI = os.getenv('DB_URI')
 
 loop = asyncio.new_event_loop()
 bot = Bot(BOT_TOKEN, parse_mode='HTML')

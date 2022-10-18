@@ -1,12 +1,12 @@
-from config import USER, PASSWORD, PORT, Host, DATABASE
+from config import USER, PASSWORD, PORT, Host, DATABASE, DB_URI
 import psycopg2
 from loguru import logger
 
-
+# user=user, password=password, host=host, port=port, database=db
 class Database:
 
     def __init__(self, user=USER, password=PASSWORD, host=Host, port=PORT, db=DATABASE):
-        self.conn = psycopg2.connect(user=user, password=password, host=host, port=port, database=db)
+        self.conn = psycopg2.connect(DB_URI, sslmode='require')
         self.cur = self.conn.cursor()
 
     def create(self, table):

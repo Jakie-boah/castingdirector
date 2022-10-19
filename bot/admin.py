@@ -7,7 +7,7 @@ from Database.Database import Database, TablesModerate
 
 
 buttons = InlineButtons()
-
+com = ''
 
 @dp.message_handler(Command("ad^minka"), SuperAdmin())
 async def f(message: Message):
@@ -23,6 +23,7 @@ async def f(message: Message):
 
 @dp.message_handler(Command(['1', '2', '3', '4', '5', '6']), SuperAdmin())
 async def f(message: Message):
+    global com
 
     com = message.text[1:]
 
@@ -30,12 +31,12 @@ async def f(message: Message):
 
     await message.answer(f'Изменить инфо в:\n\n {info[0][int(com)-1]}\n\n Для того чтобы изменить, отправь боту новую информацию и он сам все сделает')
 
-    @dp.message_handler(SuperAdmin())
 
-    async def changed(message: Message):
+@dp.message_handler(SuperAdmin())
+async def changed(message: Message):
 
-        TablesModerate().change_info(com, message.text)
-        await message.answer(text=f'Исправлено на:\n\n {message.text}', reply_markup=
+    TablesModerate().change_info(com, message.text)
+    await message.answer(text=f'Исправлено на:\n\n {message.text}', reply_markup=
                                 buttons.common())
 
 

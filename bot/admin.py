@@ -34,11 +34,15 @@ async def f(message: Message):
 
 @dp.message_handler(SuperAdmin())
 async def changed(message: Message):
+    global com
+    try:
+        TablesModerate().change_info(com, message.text)
+        com = ''
 
-    TablesModerate().change_info(com, message.text)
-    await message.answer(text=f'Исправлено на:\n\n {message.text}', reply_markup=
-                                buttons.common())
-
+        await message.answer(text=f'Исправлено на:\n\n {message.text}', reply_markup=
+                                    buttons.common())
+    except:
+        pass
 
 
 

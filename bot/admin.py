@@ -1,24 +1,20 @@
-from config import dp, bot
+from config import dp
+from handlers.junk import numbers, admin_beg
 from aiogram.types import Message, CallbackQuery
 from handlers.InlineButtons import InlineButtons
 from handlers.filter import SuperAdmin
 from aiogram.dispatcher.filters import Command
 from Database.Database import Database, TablesModerate
 
-
 buttons = InlineButtons()
 com = ''
 
-@dp.message_handler(Command("ad^minka"), SuperAdmin())
+
+@dp.message_handler(Command("adminka"), SuperAdmin())
 async def f(message: Message):
-    info = Database().get_chats()
-    await message.answer(f'Выбери что изменить и нажми на соответсвующую кнопку:\n\n'
-                         f' 1⃣:\n {info[0][0]}\n'
-                         f' 2⃣:\n {info[0][1]}\n'
-                         f' 3⃣:\n {info[0][2]}\n'
-                         f' 4⃣:\n {info[0][3]}\n'
-                         f' 5⃣:\n {info[0][4]}\n'
-                         f' 6⃣:\n {info[0][5]}\n', disable_web_page_preview=True, reply_markup=buttons.admin_options())
+
+    await message.answer(f'Выбери что изменить и нажми на соответсвующую кнопку - \n\n{admin_beg()}',
+                         disable_web_page_preview=True, reply_markup=buttons.admin_options())
 
 
 @dp.message_handler(Command(['1', '2', '3', '4', '5', '6']), SuperAdmin())
@@ -29,26 +25,75 @@ async def f(message: Message):
 
     info = Database().get_chats()
 
-    await message.answer(f'Изменить инфо в:\n\n {info[0][int(com)-1]}\n\n Для того чтобы изменить, отправь боту новую информацию и он сам все сделает')
+    await message.answer(f'Какую инфо поменять в кнопке {info[int(com)-1][1]}?\n\n'
+                         f'Текст или ссылку?', reply_markup=buttons.info_or_link())
 
 
-@dp.message_handler(SuperAdmin())
-async def changed(message: Message):
-    global com
-    try:
-        TablesModerate().change_info(com, message.text)
-        com = ''
+@dp.callback_query_handler(text='text')
+async def inline_kb_answer_callback_handler(query: CallbackQuery):
+    answer_data = query.data
 
-        await message.answer(text=f'Исправлено на:\n\n {message.text}', reply_markup=
-                                    buttons.common())
-    except:
-        pass
+    if answer_data == 'text':
+        await query.message.answer('Напиши новый текст и бот сам все сделает')
+        text()
 
 
+def text():
+    @dp.message_handler(SuperAdmin())
+    async def changed(message: Message):
+        global com
+
+        try:
+            TablesModerate().change_text(com, message.text)
+
+            await message.answer(text=f'Исправлено на:\n\n {message.text}', reply_markup=
+            buttons.common())
+
+        except:
+            pass
 
 
+@dp.callback_query_handler(text='link')
+async def inline_kb_answer_callback_handler(query: CallbackQuery):
+    answer_data = query.data
+
+    if answer_data == 'link':
+
+        await query.message.answer('Напиши новый ссылку и бот сам все сделает')
+
+        link()
 
 
+def link():
+    @dp.message_handler(SuperAdmin())
+    async def changed(message: Message):
+        global com
+
+        try:
+
+            TablesModerate().change_link(com, message.text)
+
+            await message.answer(text=f'Исправлено на:\n\n {message.text}', reply_markup=buttons.common())
+
+        except:
+            pass
 
 
+@dp.callback_query_handler(text='delete')
+async def inline_kb_answer_callback_handler(query: CallbackQuery):
+    answer_data = query.data
+
+    if answer_data == 'delete':
+
+        await query.message.answer('Вы уверены?', reply_markup=buttons.sure())
+
+
+@dp.callback_query_handler(text='yes')
+async def inline_kb_answer_callback_handler(query: CallbackQuery):
+    answer_data = query.data
+
+    if answer_data == 'yes':
+        print(com)
+        TablesModerate().delete_button(com)
+        await query.message.answer('Кнопка удалена', reply_markup=buttons.common())
 

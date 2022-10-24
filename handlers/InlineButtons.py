@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+from Database.Database import Database
 
 
 class InlineButtons:
@@ -9,29 +10,41 @@ class InlineButtons:
         return markup.add(menu)
 
     def introduce(self):
+        C = []
         markup = InlineKeyboardMarkup(row_width=2)
-        menu = InlineKeyboardButton('📃 Меню', callback_data='menu')
-        reviews = InlineKeyboardButton('📣 Отзывы', callback_data='reviews')
-        drugs = InlineKeyboardButton('🙏 Товары которые я рекомендую', callback_data='drugs')
-        return markup.add(menu, reviews, drugs)
+        for i in Database().get_chats():
+            C.append(InlineKeyboardButton(text=i[1], url=f'{i[2]}',  callback_data=f'{i[0]}'))
+        c = 0
+        for i in C:
+            markup.row(*C[c:c+2])
+            c += 2
+        return markup
 
     def admin_options(self):
-
         markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-        info_1 = KeyboardButton('/1')
-        info_2 = KeyboardButton('/2')
-        info_3 = KeyboardButton('/3')
-        info_4 = KeyboardButton('/4')
-        info_5 = KeyboardButton('/5')
-        info_6 = KeyboardButton('/6')
+        for i in Database().get_chats():
+            markup.add('/' + str(i[0]))
+        markup.add('/Добавить кнопку')
+        return markup
 
-        return markup.add(info_1, info_2, info_3, info_4, info_5, info_6)
+    def info_or_link(self):
+        markup = InlineKeyboardMarkup(row_width=3)
+        text = InlineKeyboardButton('📋 Текст', callback_data='text')
+        link = InlineKeyboardButton('📡 Ссылку', callback_data='link')
+        delete = InlineKeyboardButton('❌ Удалить кнопку', callback_data='delete')
+        menu = InlineKeyboardButton('◀ На главную', callback_data='start')
+        markup.add(text, link, delete, menu)
+        return markup
 
-    def reviews_buttons(self):
+    def sure(self):
         markup = InlineKeyboardMarkup(row_width=2)
-        video_review = InlineKeyboardButton('📹 Видео отзывы', callback_data='video_review')
-        hand_review = InlineKeyboardButton('✉ Письменные отзывы', callback_data='hand_review')
-        back = InlineKeyboardButton('◀ Назад', callback_data='start')
-        return markup.add(video_review, hand_review, back)
+        yes = InlineKeyboardButton('Да', callback_data='yes')
+        no = InlineKeyboardButton('Нет', callback_data='start')
+        markup.add(yes, no)
+        return markup
 
-
+    def done(self):
+        markup = InlineKeyboardMarkup(row_width=2)
+        done = InlineKeyboardButton('Готово', callback_data='done')
+        markup.add(done)
+        return markup

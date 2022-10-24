@@ -3,10 +3,16 @@ import psycopg2
 from loguru import logger
 
 # user=user, password=password, host=host, port=port, database=db
+
+
 class Database:
 
     def __init__(self, user=USER, password=PASSWORD, host=Host, port=PORT, db=DATABASE):
         self.conn = psycopg2.connect(DB_URI, sslmode='require')
+
+    # def __init__(self, user=USER, password=PASSWORD, host='127.0.0.1', port='5432', db='back_info'):
+    #
+    #     self.conn = psycopg2.connect(user=user, password=password, host=host, port=port, database=db)
         self.cur = self.conn.cursor()
 
     def create(self, table):
@@ -20,7 +26,7 @@ class Database:
         logger.info("В таблицу успешно добавлены новые данные")
 
     def get_chats(self):
-        self.cur.execute('select * from info')
+        self.cur.execute('select * from buttons')
         chat_records = self.cur.fetchall()
         return chat_records
 
@@ -30,15 +36,12 @@ class CreateTables:
         self.db = Database()
 
         self.db.create("""
-            CREATE TABLE IF NOT EXISTS info (
+            CREATE TABLE IF NOT EXISTS buttons (
 
-           
-            info_1 text NOT NULL,
-            info_2 text NOT NULL,
-            info_3 text,
-            info_4 text,
-            info_5 text,
-            info_6 text
+            id serial PRIMARY KEY,
+            button_name text NOT NULL,
+            url text NOT NULL
+            
             
             )""")
 
@@ -47,17 +50,26 @@ class TablesModerate:
     def __init__(self):
         self.db = Database()
 
-    def add_new_info(self):
-
-        self.db.insert("""
-        INSERT INTO info (info_1, info_2, info_3, info_4, info_5, info_6)
-        VALUES (%s, %s, %s, %s, %s, %s);
-
-        """, 'Меню', 'Содержание меню', 'Отзывы', 'Видео Отзывы', 'Письменные отзывы', 'Товары которые я советую')
-
-    def change_info(self, info_num, new_info):
+    def change_text(self, info_num, new_info):
 
         self.db.insert(f"""
-        UPDATE info SET info_{info_num}=%s""", new_info)
+        UPDATE buttons SET button_name=%s WHERE id={info_num}""", new_info)
         logger.info("Правил")
 
+    def change_link(self, info_num, new_link):
+
+        self.db.insert(f"""
+        UPDATE buttons SET url=%s WHERE id={info_num}""", new_link)
+        logger.info("Правил")
+
+    def delete_button(self, info_num):
+        self.db.insert(f"""
+        DELETE from buttons  WHERE id={info_num}""")
+        logger.info("Удалил")
+
+    def add_info(self, name, url):
+        self.db.insert("""
+                INSERT INTO buttons (button_name, url)
+                VALUES (%s, %s);
+
+                """, name, url)

@@ -1,7 +1,6 @@
-from config import dp
+from config import dp, bot
 from aiogram.dispatcher.filters import Command
 from handlers.InlineButtons import InlineButtons
-from Database.Database import Database
 from aiogram.types import Message, CallbackQuery
 
 buttons = InlineButtons()
@@ -10,9 +9,7 @@ buttons = InlineButtons()
 @dp.message_handler(Command(['start', 'help'], prefixes='!/'))
 async def start(message: Message):
 
-    info = Database().get_chats()
-
-    await message.answer(f'{info[0][0]}', reply_markup=buttons.introduce())
+    await message.answer(f'Навигация', reply_markup=buttons.introduce())
 
     await message.delete()
 
@@ -24,14 +21,11 @@ async def inline_kb_answer_callback_handler(query: CallbackQuery):
 
     if answer_data == 'start':
 
-        info = Database().get_chats()
-
-        await query.message.edit_text(f'{info[0][0]}', reply_markup=buttons.introduce())
+        await query.message.edit_text(f'Навигация', reply_markup=buttons.introduce())
 
 
-
-
-
-
+@dp.message_handler(commands=['start_bot'])
+async def start():
+    await bot.send_message(-1001707361135, 'Навигация', reply_markup=buttons.introduce())
 
 

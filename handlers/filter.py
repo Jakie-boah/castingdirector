@@ -1,6 +1,5 @@
-from aiogram.dispatcher.filters import Text
 from aiogram.types import Message
-from config import dp, bot, list_super_admins
+from config import list_super_admins
 from aiogram.dispatcher.filters import BoundFilter
 
 
